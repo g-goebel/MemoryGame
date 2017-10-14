@@ -46,6 +46,7 @@ let init = function(){
 
 };
 
+
 /*
 * Event listener is called if user clicks on any card, is registered to the element
 * higher in the hierarchy since this is not created dynamically.
@@ -77,6 +78,8 @@ $(".deck").on("click", "li", function(){
     if (cardA.image == cardB.image){
       increasePoints();
       match($("#" + cardANumber), $("#" + cardBNumber));
+      if (points === 8)  // maximum points are reached
+        gameOver();
     }
     //not identical? turn red and flip
     else{
@@ -98,6 +101,7 @@ $(".deck").on("click", "li", function(){
 
 });
 
+
 /*
 * expects the current card as an jQuery-Object and returns the relating id
 */
@@ -106,6 +110,7 @@ let getCardNumber = function(card){
   return card.attr("id");
 
 };
+
 
 /*
 * Turns the card and shows the image. Expects a jQuery-object and is added to
@@ -120,6 +125,7 @@ jQuery.fn.flipCard = function() {
 
 };
 
+
 /*
 * Expects two cards as input and changes the colors
 */
@@ -129,6 +135,7 @@ let match = function(cardA, cardB){
   cardB.addClass("match");
 
 };
+
 
 /*
 * Expects two cards as input and changes the colors,
@@ -162,6 +169,7 @@ let showResult = function(){
 
 };
 
+
 /*
 * returns a string depending on the points the player received
 */
@@ -193,6 +201,7 @@ let getResult = function(){
 
 };
 
+
 /*
 * reduceds the amount of moves which can be played, returns true if no moves left
 */
@@ -204,6 +213,7 @@ let reduceMoves = function() {
   return false;
 };
 
+
 /*
 * increases the points by one and updates the display
 */
@@ -213,6 +223,7 @@ let increasePoints = function(){
   $("#points").text(points);
 
 };
+
 
 /*
 * is called when no moves are left, opens all cards to the player,
@@ -226,6 +237,7 @@ let gameOver = function(){
 
 };
 
+
 /*
 * constructor for memory cards
 */
@@ -234,6 +246,7 @@ function MemoryCard(image) {
   this.image = image;
 
 };
+
 
 /*
 * Shuffle function from http://stackoverflow.com/a/2450976
@@ -252,6 +265,7 @@ function shuffle(array) {
   return array;
 
 };
+
 
 /*
 * Resets all values and removes the cards
@@ -272,6 +286,7 @@ let reset = function() {
   $("#moves").text(moves);
 
 };
+
 
 /*
 *
@@ -295,6 +310,7 @@ span.onclick = function() {
   init();
 
 };
+
 
 /*
 * Close the modal if user clicks somewhere else
