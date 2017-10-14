@@ -18,36 +18,45 @@
     </header>
 
     <section class="score-panel">
+      <!-- Don't understand the additional values of the stars, so I didn't implement them
       <ul class="stars">
-        <li><i class="fa fa-star"></i></li>
-        <li><i class="fa fa-star"></i></li>
-        <li><i class="fa fa-star"></i></li>
-      </ul>
+      <li><i class="fa fa-star"></i></li>
+      <li><i class="fa fa-star"></i></li>
+      <li><i class="fa fa-star"></i></li>
+    </ul>
+  -->
+  <span class = "distance" id="moves">3</span> Moves
+  <span class = "distance" id="points">0</span>Points
 
-      <span class = "distance" id="moves">3</span> Moves
-      <span class = "distance" id="points">0</span>Points
-
-      <div class="restart" onclick="init();">
-        <i class="fa fa-repeat"></i>
-      </div>
-    </section>
-    <ul class="deck">
+  <div class="restart" onclick="init();">
+    <i class="fa fa-repeat"></i>
+  </div>
+</section>
+<ul class="deck">
   <!--here go all the memory cards-->
 
-    </ul>
+</ul>
 
-    <!--Modal to show the final score-->
-    <div id="myModal" class="modal">
-      <!-- Modal content -->
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <p id="finalScore" ></p>
-        <p class="fa fa-smile-o "></p>
-      </div>
-
-    </div>
+<!--Modal to show the final score-->
+<div id="myModal" class="modal">
+  <!-- Modal content -->
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <p id="finalScore" ></p>
+    <p class="fa fa-smile-o "></p>
   </div>
 
-  <script src="js/app.js"></script>
+</div>
+</div>
+
+<p>
+  <a href="http://jigsaw.w3.org/css-validator/check/referer">
+    <img style="border:0;width:88px;height:31px"
+    src="http://jigsaw.w3.org/css-validator/images/vcss"
+    alt="CSS ist valide!" />
+  </a>
+</p>
+
+<script src="js/app.js"></script>
 </body>
 </html>
