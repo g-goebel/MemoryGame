@@ -14,6 +14,10 @@ let listOfCards; //global list holding all card objects
 let points; //global variable representing the received points
 let moves; //global variable representing the moves left
 let isCardOpen; //variable to decide if there is alread an open card
+let startingTime;
+let starRating;
+let date;
+let gameOngoing;
 
 //values used to exchange information about open cards when toggling between isCardOpen yes/no
 let cardA;
@@ -29,6 +33,8 @@ let init = function(){
 
   reset(); //clean everything up
 
+  date = new Date();
+  startingTime = date.getTime();
   listOfCards = new Array();
   //creates new MemoryCards and allocates an image
   for (let counter = 0; counter < CONST_LIST_OF_ITEMS.length; counter++){
@@ -46,6 +52,31 @@ let init = function(){
 
 };
 
+//from https://stackoverflow.com/questions/19429890/javascript-timer-just-for-minutes-and-seconds
+
+$(document).ready(function (e) {
+    var $timer = $("#timer");
+
+    function update() {
+        var myTime = $timer.html();
+        var ss = myTime.split(":");
+        var dt = new Date();
+        dt.setHours(0);
+        dt.setMinutes(ss[0]);
+        dt.setSeconds(ss[1]);
+
+        var dt2 = new Date(dt.valueOf() + 1000);
+        var temp = dt2.toTimeString().split(" ");
+        var ts = temp[0].split(":");
+
+        $timer.html(ts[1]+":"+ts[2]);
+        if(gameOngoing){
+          setTimeout(update, 1000);
+        }
+    }
+      setTimeout(update, 1000);
+
+});
 
 /*
 * Event listener is called if user clicks on any card, is registered to the element
@@ -71,6 +102,7 @@ $(".deck").on("click", "li", function(){
 
   //case 2: second card is opened, get 2nd card from object list
   if(isCardOpen){
+    increaseMoves();
     cardBNumber = getCardNumber($(this)); //id from card in html
     cardB = listOfCards[cardBNumber]; //corresponding object in list
 
@@ -78,18 +110,20 @@ $(".deck").on("click", "li", function(){
     if (cardA.image == cardB.image){
       increasePoints();
       match($("#" + cardANumber), $("#" + cardBNumber));
-      if (points === 8)  // maximum points are reached
+      if (points === 8){  // maximum points are reached
+        gameOngoing = false;
         gameOver();
+      }
     }
     //not identical? turn red and flip
     else{
       //count moves down until zero, then call gameOver
-      if (reduceMoves() == true){
-        noMatch($("#" + cardANumber), $("#" + cardBNumber), 0); //flip back immediately
-        gameOver();
-      } else {
-        noMatch($("#" + cardANumber), $("#" + cardBNumber), CONST_DELAY); //flip back after x ms
-      }
+      // if (reduceMoves() == true){
+      //   noMatch($("#" + cardANumber), $("#" + cardBNumber), 0); //flip back immediately
+      //   gameOver();
+      // } else {
+         noMatch($("#" + cardANumber), $("#" + cardBNumber), CONST_DELAY); //flip back after x ms
+      // }
     }
   }
   //reset values for the next round
@@ -175,29 +209,7 @@ let showResult = function(){
 */
 let getResult = function(){
 
-  switch(points){
-    case (0):
-    return "Too bad! You didn't find a single pair!";
-    break;
-    case (1):
-    return "Could be better, you just have 1 point!";
-    break;
-    case( 2):
-    return "Could be better, you just have 2 points!";
-    break;
-    case (3):
-    case(4):
-    case(5):
-    return "Great job! You have " + points + " points!";
-    break;
-    case (6):
-    return "Awesome! You almost found all pairs and received 6 points!";
-    break;
-    //7 cannot exist since there is just one pair left
-    case (8):
-    return "Perfect! You found all pairs!";
-    break;
-  }
+    return "You needed " + moves + " moves to find all matching pairs and it needed " + $("#timer").text() + " for it";
 
 };
 
@@ -205,12 +217,12 @@ let getResult = function(){
 /*
 * reduceds the amount of moves which can be played, returns true if no moves left
 */
-let reduceMoves = function() {
-  moves--;
+let increaseMoves = function() {
+  moves++;
   $("#moves").text(moves);
-  if (moves === 0)
-  return true;
-  return false;
+  // if (moves === 0)
+  // return true;
+  // return false;
 };
 
 
@@ -237,6 +249,13 @@ let gameOver = function(){
 
 };
 
+let getTimeNeeded = function(){
+
+  let currentTime = date.getTime();
+  let timesInSecond = currentTime - startingTime;
+
+  return timesInSecond;
+}
 
 /*
 * constructor for memory cards
@@ -279,7 +298,11 @@ let reset = function() {
   cardANumber = 0;
   cardB = null;
   cardBNumber = 0;
-  moves = CONST_MOVES;
+  startingTime = 0;
+  starRating = 0;
+  // moves = CONST_MOVES;
+  moves = 0;
+  gameOngoing = true;
 
   $(".deck").children().remove();
   $("#points").text(points);
