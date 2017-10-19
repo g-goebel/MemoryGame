@@ -7,17 +7,20 @@
 //constants
 const CONST_LIST_OF_ITEMS = ["fa-diamond", "fa-paper-plane-o", "fa-anchor", "fa-bolt", "fa-cube", "fa-leaf", "fa-bicycle", "fa-bomb"];
 const CONST_DELAY = 1000; //sets the delay after a not matching pair is turned
-const CONST_MOVES = 3; //change here if you want to have more tries
+const CONST_THREE_STARS = 15; //threshold when first star is removed
+const CONST_TWO_STARS = 25; //threshold when second star is removed
+
 
 //global variables
 let listOfCards; //global list holding all card objects
-let points; //global variable representing the received points
-let moves; //global variable representing the moves left
+let matchedPairs; //global variable representing the matching pairs
+let moves; //global variable counting the moves
 let isCardOpen; //variable to decide if there is alread an open card
-let startingTime;
-let starRating;
-let date;
+//let starRating;
+let timeNeeded;
 let gameOngoing;
+let numberOfStars;
+let rankingList;
 
 //values used to exchange information about open cards when toggling between isCardOpen yes/no
 let cardA;
@@ -25,22 +28,25 @@ let cardANumber;
 let cardB;
 let cardBNumber;
 
+//initialize when website is loaded
+onload = function(){init();};
 
 /*
 * Initializes the game, is called when website is loaded or after one round is over.
 */
 let init = function(){
 
-  reset(); //clean everything up
+  reset(); //clean everything up and initializes values
+  rankingList = getRankingListBackFromStorage(); //load list of best players from storage...
+  updateRanking(); //...and update screen
 
-  date = new Date();
-  startingTime = date.getTime();
   listOfCards = new Array();
   //creates new MemoryCards and allocates an image
   for (let counter = 0; counter < CONST_LIST_OF_ITEMS.length; counter++){
     listOfCards.push(new MemoryCard(CONST_LIST_OF_ITEMS[counter]));
     listOfCards.push(new MemoryCard(CONST_LIST_OF_ITEMS[counter])); //two times since always a pair has to be created
   }
+
   //shuffles the cards in the list
   shuffle(listOfCards);
 
@@ -52,43 +58,25 @@ let init = function(){
 
 };
 
-//from https://stackoverflow.com/questions/19429890/javascript-timer-just-for-minutes-and-seconds
-
-$(document).ready(function (e) {
-    var $timer = $("#timer");
-
-    function update() {
-        var myTime = $timer.html();
-        var ss = myTime.split(":");
-        var dt = new Date();
-        dt.setHours(0);
-        dt.setMinutes(ss[0]);
-        dt.setSeconds(ss[1]);
-
-        var dt2 = new Date(dt.valueOf() + 1000);
-        var temp = dt2.toTimeString().split(" ");
-        var ts = temp[0].split(":");
-
-        $timer.html(ts[1]+":"+ts[2]);
-        if(gameOngoing){
-          setTimeout(update, 1000);
-        }
-    }
-      setTimeout(update, 1000);
-
-});
 
 /*
 * Event listener is called if user clicks on any card, is registered to the element
 * higher in the hierarchy since this is not created dynamically.
 * This function hold the main logic for the game:
-* Turns the card which was clicked, decides if it's the first or second card opened.
+* Check if the card is locked (due to match before), turns the card which was clicked,
+* decides if it's the first or second card opened.
 * If it was the first card, it gets the id of the card, sets the boolan value
 * "isCardOpen" and waits for the next.
-* If it was the second, it gets the id, compares if equal, increases the points if so
-* or turns back the cards and decreases the moves left.
+* If it was the second, it gets the id, compares if equal, turns to green if so,
+* increases the moves and turns back the cards
 */
 $(".deck").on("click", "li", function(){
+
+  gameOngoing = true; //start counter
+
+  //already matching pair from a round before?
+  if( $(this).hasClass("locked"))
+    return;
 
   $(this).flipCard(); //open the new card
 
@@ -102,28 +90,29 @@ $(".deck").on("click", "li", function(){
 
   //case 2: second card is opened, get 2nd card from object list
   if(isCardOpen){
-    increaseMoves();
-    cardBNumber = getCardNumber($(this)); //id from card in html
-    cardB = listOfCards[cardBNumber]; //corresponding object in list
 
-    //cards are identical? points plus one
+    cardBNumber = getCardNumber($(this)); //id from card in html
+    if  (cardANumber === cardBNumber){ //clicked on the same card twice?
+      $(this).flipCard(); //open the new card
+      return;
+    }
+    cardB = listOfCards[cardBNumber]; //corresponding object in list
+    increaseMoves();
+
+    //cards are identical? matchedPairs plus one
     if (cardA.image == cardB.image){
-      increasePoints();
-      match($("#" + cardANumber), $("#" + cardBNumber));
-      if (points === 8){  // maximum points are reached
-        gameOngoing = false;
-        gameOver();
+      matchedPairs++;
+      match($("#" + cardANumber), $("#" + cardBNumber)); //turn to green and lock
+
+      if (matchedPairs === 8){  // maximum pairs are reached
+        gameOngoing = false; //stop counter
+        gameOver(); //call modal and rating
       }
     }
+
     //not identical? turn red and flip
     else{
-      //count moves down until zero, then call gameOver
-      // if (reduceMoves() == true){
-      //   noMatch($("#" + cardANumber), $("#" + cardBNumber), 0); //flip back immediately
-      //   gameOver();
-      // } else {
          noMatch($("#" + cardANumber), $("#" + cardBNumber), CONST_DELAY); //flip back after x ms
-      // }
     }
   }
   //reset values for the next round
@@ -153,7 +142,6 @@ let getCardNumber = function(card){
 jQuery.fn.flipCard = function() {
 
   var o = $(this);
-  //var o = $(this[0]);
   o.toggleClass("open show");
   return this;
 
@@ -161,12 +149,15 @@ jQuery.fn.flipCard = function() {
 
 
 /*
-* Expects two cards as input and changes the colors
+* Expects two cards as input and changes the colors to "match". Afterwards
+* the cards are locked so that the user cannot turn back
 */
 let match = function(cardA, cardB){
 
   cardA.addClass("match");
+  cardA.addClass("locked");
   cardB.addClass("match");
+  cardB.addClass("locked");
 
 };
 
@@ -174,14 +165,13 @@ let match = function(cardA, cardB){
 /*
 * Expects two cards as input and changes the colors,
 * after "delay" miliseconds, the cards are turned back.
-* "delay" as additional variable is necessary for the last move
-* when gameOver() is called, otherwise the last selected cards flip back
-* after delay
 */
 let noMatch = function(cardA, cardB, delay){
 
   cardA.toggleClass("noMatch");
   cardB.toggleClass("noMatch");
+  cardA.effect("shake");
+  cardB.effect("shake");
   setTimeout(function(){
     cardA.toggleClass("noMatch");
     cardB.toggleClass("noMatch");
@@ -194,7 +184,7 @@ let noMatch = function(cardA, cardB, delay){
 
 /*
 * is called from gameOver(), gets the corresponding string from getResult(),
-* updated it on the modal and opens the modal
+* updates it on the modal and opens the modal
 */
 let showResult = function(){
 
@@ -203,59 +193,82 @@ let showResult = function(){
 
 };
 
+/*
+* Returns score based on stars and time needed: Stars dived by time in seconds,
+* rounded on three digits
+*/
+
+let getScore = function() {
+
+  return (Math.round(numberOfStars/timeNeeded*1000));
+
+}
+
 
 /*
-* returns a string depending on the points the player received
+* Returns the string with the final score depending on the amount of moves/the stars the time the player needed
 */
 let getResult = function(){
 
-    return "You needed " + moves + " moves to find all matching pairs and it needed " + $("#timer").text() + " for it";
+    return "You needed " + moves + " moves and " + timeNeeded + " seconds to find all matching"
+    + "pairs with an overall rating of " + numberOfStars + " stars. Keep practicing and try"
+    + "again! \r\n\n Total score: " + getScore() ;
 
 };
 
 
 /*
-* reduceds the amount of moves which can be played, returns true if no moves left
+* Reduces the amount of stars and removes the highest star with an animation from the screen
+*/
+let removeStar = function(){
+
+  numberOfStars--; //has to be called first since "eq" starts counting with zero
+  $(".fa-star:eq(" + numberOfStars + ")").addClass("redStar").effect("pulsate").effect("explode", function(){$(".fa-star:eq(" +
+  numberOfStars + ")").removeClass("redStar").removeClass("blueStar").removeAttr("style");});
+
+}
+
+
+/*
+* increases the amount of moves everytime two cards were turned and updates the value on the screen. On certain thresholds
+* the amount of stars is reduced
 */
 let increaseMoves = function() {
+
   moves++;
-  $("#moves").text(moves);
-  // if (moves === 0)
-  // return true;
-  // return false;
+  $("#moves-display").text(moves);
+
+  if (moves === CONST_THREE_STARS)
+    removeStar();
+  if (moves === CONST_TWO_STARS)
+    removeStar();
 };
 
 
 /*
-* increases the points by one and updates the display
+* Starts to count the seconds once the first card is clicked and updates it on the screen
+* //https://stackoverflow.com/questions/5517597/plain-count-up-timer-in-javascript
 */
-let increasePoints = function(){
-
-  points++;
-  $("#points").text(points);
-
-};
+let timer = setInterval( function(){
+  if(gameOngoing){
+      timeNeeded++;
+      $("#timer-display").text(timeNeeded);
+    }
+},1000);
 
 
 /*
 * is called when no moves are left, opens all cards to the player,
-* changes the color and displays the result
+* changes the color and calls showResult() to display the score
 */
 let gameOver = function(){
 
-  $("li").flipCard();
-  $("li").addClass("gameOver");
+  $(".card").flipCard();
+  $(".card").addClass("gameOver");
   showResult();
 
 };
 
-let getTimeNeeded = function(){
-
-  let currentTime = date.getTime();
-  let timesInSecond = currentTime - startingTime;
-
-  return timesInSecond;
-}
 
 /*
 * constructor for memory cards
@@ -292,21 +305,132 @@ function shuffle(array) {
 let reset = function() {
 
   openCardCounter = 0;
-  points = 0;
+  matchedPairs = 0;
   listOfCards = null;
   cardA = null;
   cardANumber = 0;
   cardB = null;
   cardBNumber = 0;
-  startingTime = 0;
-  starRating = 0;
-  // moves = CONST_MOVES;
+//  starRating = 3;
   moves = 0;
-  gameOngoing = true;
+  gameOngoing = false;
+  timeNeeded = 0;
+  numberOfStars = 3;
 
   $(".deck").children().remove();
-  $("#points").text(points);
-  $("#moves").text(moves);
+  $("#moves-display").text(moves);
+  $(".fa-star").addClass("blueStar");
+  $("#timer-display").text(timeNeeded);
+  $("#playerName").val("");
+
+};
+
+
+/*
+*
+* Part to implement the ranking of the players
+*
+*/
+
+/*
+* Function is called to update the ranking list in memory and on the screen.
+* Therefore the rankingList is orderd highest score first, cut to three entries
+* in total, then the website is updated and the current list is written back to memory
+*/
+let updateRanking = function() {
+
+    sortRanking(); //right order highest score to lowest
+    if (rankingList.length > 3)
+      rankingList = rankingList.slice(0, 3); //just the first three stay in the list
+
+    for (let counter = 1; counter <= rankingList.length; counter ++){
+        $("table tr:eq(" + (counter) + ") td:eq(1)").text(rankingList[counter-1][0]);
+        $("table tr:eq(" + (counter) + ") td:eq(2)").text(rankingList[counter-1][1]);
+    }
+      //since no arrays are supported by local storage, it has to be converted to a string
+      localStorage.setItem("rankingList", array2String(rankingList));
+
+};
+
+/*
+* Saved list is read out of memory. Since the rankingList is a 2dimensional-array and
+* the local storage just saves strings, the list has to be reconverted to the array.
+* If no list was saved (first time or list deleted by user), an empty list is generated.
+*/
+let getRankingListBackFromStorage = function(){
+
+  let tempRankingList = localStorage.getItem("rankingList");
+  //memory not empty?
+  if(tempRankingList != null){
+    tempRankingList = tempRankingList.split(","); //split from comma separated string to 1d-array
+    rankingList = new Array();
+    //recreate 2d-array
+    for (let counter=0; counter < tempRankingList.length; counter=counter + 2) {
+      rankingList.push([tempRankingList[counter], tempRankingList[counter+1]]);
+    }
+
+    return rankingList;
+    //memory empty!
+  } else {
+      return [["",""],["",""],["",""]];
+  }
+
+};
+
+/*
+* Helper function to convert array into an comma separated string. Expects an array as input
+*/
+
+let array2String = function(array){
+
+  let tempString;
+
+  tempString = array[0]; //avoid leading comma
+
+  for (let counter = 1; counter < array.length; counter++) {
+    tempString = tempString + "," + array[counter];
+  }
+
+  return tempString;
+
+};
+
+
+/*
+* Deletes the data locally saved
+*/
+let deleteRanking = function() {
+
+  localStorage.removeItem("rankingList"); //clear list from local storage
+  init(); //refresh page and table
+
+};
+
+
+/*
+* Function brings the rankingList in the right order high score to low score
+* with little support from https://stackoverflow.com/questions/3524827/sort-a-2d-array-by-the-second-value/3524832
+*/
+let sortRanking = function() {
+
+  rankingList.sort(function (a, b) {
+  return  b[1] -  a[1];
+  });
+
+};
+
+
+/*
+* Function is called when the player typed in his name. The name is saved with the score
+* in the rankingList and will appear in the top three if the score was high enough. The
+* modal disappears after the user pushed on the ok button
+*/
+let saveName = function(){
+
+  modal.style.display = "none";
+  rankingList.push([$("#playerName").val(), getScore()]);
+  updateRanking();
+  init();
 
 };
 
@@ -325,24 +449,27 @@ var modal = document.getElementById('myModal');
 var span = document.getElementsByClassName("close")[0];
 
 /*
-*  When the user clicks on <span> (x), close the modal
+* Eventlistener for the modal
 */
-span.onclick = function() {
 
-  modal.style.display = "none";
-  init();
+$("#closeButton").click(function() {
+  saveName();
+});
 
-};
+$("#closeButton").keypress(function() {
+      saveName();
 
+});
 
-/*
-* Close the modal if user clicks somewhere else
-*/
+$("#deleteButton").click(function() {
+  deleteRanking();
+});
+
+//Close the modal if user clicks somewhere else
 window.onclick = function(event) {
 
   if (event.target == modal) {
-    modal.style.display = "none";
-    init();
+    saveName();
   }
 
 };
