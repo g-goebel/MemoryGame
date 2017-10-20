@@ -1,20 +1,22 @@
 # Memory Game Project
 
 ## Table of Contents
+* Installation
+* Usage
 
-* [Instructions](#instructions)
-* [Contributing](#contributing)
 
-## Instructions
+## Installation
 
-The starter project has some HTML and CSS styling to display a static version of the Memory Game project. You'll need to convert this project from a static project to an interactive one. This will require modifying the HTML and CSS files, but primarily the JavaScript file.
+Download the files using git to your local directory:
 
-To get started, open `js/app.js` and start building out the app's functionality
+git clone https://github.com/g-goebel/MemoryGame.git
 
-For specific, detailed instructions, look at the project instructions in the [Udacity Classroom](https://classroom.udacity.com/me).
+## Usage
+Open file "index.html" in browser, the "Matching Game" should appear
+The game starts as soon as the first tile is clicked and the timer starts.
+The goal is to find all matching pairs of cards. If more and more not matching pairs are clicked, the rating goes from three stars down to two and then to one.
+If all pairs are found, the player gets a rating based on time needed and number of stars. So the challenge is to find all pairs with just few mismatches as quick as possible.
 
-## Contributing
+The best three players appear in the list below the field, the list is stored persistantly in the local storage and can be deleted via the "Delete ranking"-button.
 
-This repository is the starter code for _all_ Udacity students. Therefore, we most likely will not accept pull requests.
-
-For details, check out [CONTRIBUTING.md](CONTRIBUTING.md).
+The game can be resetted with with the reset button next to the time above the game field.

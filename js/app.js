@@ -211,8 +211,8 @@ let getScore = function() {
 let getResult = function(){
 
     return "You needed " + moves + " moves and " + timeNeeded + " seconds to find all matching"
-    + "pairs with an overall rating of " + numberOfStars + " stars. Keep practicing and try"
-    + "again! \r\n\n Total score: " + getScore() ;
+    + " pairs with an overall rating of " + numberOfStars + " stars. Keep practicing and try"
+    + " again! \r\n\n Total score: " + getScore() ;
 
 };
 
