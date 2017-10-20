@@ -16,11 +16,10 @@ let listOfCards; //global list holding all card objects
 let matchedPairs; //global variable representing the matching pairs
 let moves; //global variable counting the moves
 let isCardOpen; //variable to decide if there is alread an open card
-//let starRating;
-let timeNeeded;
-let gameOngoing;
-let numberOfStars;
-let rankingList;
+let timeNeeded; //counts the time during the game
+let gameOngoing; //starts and stops the timer
+let numberOfStars; //amount of stars
+let rankingList; //global ranking list holding the best three players
 
 //values used to exchange information about open cards when toggling between isCardOpen yes/no
 let cardA;
@@ -193,6 +192,7 @@ let showResult = function(){
 
 };
 
+
 /*
 * Returns score based on stars and time needed: Stars dived by time in seconds,
 * rounded on three digits
@@ -352,6 +352,7 @@ let updateRanking = function() {
 
 };
 
+
 /*
 * Saved list is read out of memory. Since the rankingList is a 2dimensional-array and
 * the local storage just saves strings, the list has to be reconverted to the array.
@@ -376,6 +377,7 @@ let getRankingListBackFromStorage = function(){
   }
 
 };
+
 
 /*
 * Helper function to convert array into an comma separated string. Expects an array as input
