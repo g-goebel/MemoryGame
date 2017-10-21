@@ -6,7 +6,9 @@
   <title>Matching Game</title>
 
   <meta name="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+
   <!-- Include bootstrap and fonts -->
   <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
   <link rel="stylesheet prefetch" href="https://fonts.googleapis.com/css?family=Coda">
@@ -45,28 +47,29 @@
     <ul class="deck">
       <!--here will all the memory cards beeing inserted-->
     </ul>
-
-    <h2>Ranking</h2>
-
-    <table id = "rankingTable">
-      <tr>
-        <th>Place<th>Name</th><th>Score</th>
-      </tr >
-      <tr class = "ranking">
-        <td>1</td><td></td><td></td>
-      </tr>
-      <tr class = "ranking">
-        <td>2</td><td></td><td></td>
-      </tr>
-      <tr class = "ranking">
-        <td>3</td><td></td><td></td>
-      </tr>
-    </table>
-
-    <button id="deleteButton">Delete ranking</button>
-
   </div>
 
+  <div class="tableContainer">
+    <h2>Ranking</h2>
+
+      <table id = "rankingTable">
+        <tr>
+          <th>Place<th>Name</th><th>Score</th>
+        </tr >
+        <tr class = "ranking">
+          <td>1</td><td></td><td></td>
+        </tr>
+        <tr class = "ranking">
+          <td>2</td><td></td><td></td>
+        </tr>
+        <tr class = "ranking">
+          <td>3</td><td></td><td></td>
+        </tr>
+      </table>
+
+      <button id="deleteButton">Delete ranking</button>
+
+</div>
   <!--Modal to show the final score-->
   <div id="myModal" class="modal">
     <!-- Modal content -->
@@ -76,11 +79,11 @@
       <!-- Show a trophy -->
       <i class="fa fa-trophy modal-trophy"></i>
 
-      <p id="finalScore" ></p>
+      <p class="finalScore" ></p>
 
-      <input id="playerName" placeholder="Your name">
+      <input class="playerName" placeholder="Your name">
       <hr>
-      <button id="closeButton">Ok</button>
+      <button class="closeButton">Ok</button>
 
     </div>
   </div>

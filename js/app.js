@@ -187,7 +187,7 @@ let noMatch = function(cardA, cardB, delay){
 */
 let showResult = function(){
 
-  $("#finalScore").text(getResult());
+  $(".finalScore").text(getResult());
   $("#myModal").show();
 
 };
@@ -321,10 +321,13 @@ let reset = function() {
   $("#moves-display").text(moves);
   $(".fa-star").addClass("blueStar");
   $("#timer-display").text(timeNeeded);
-  $("#playerName").val("");
+  $(".playerName").val("");
 
 };
 
+let test = function(){
+  showResult();
+}
 
 /*
 *
@@ -430,7 +433,7 @@ let sortRanking = function() {
 let saveName = function(){
 
   modal.style.display = "none";
-  rankingList.push([$("#playerName").val(), getScore()]);
+  rankingList.push([$(".playerName").val(), getScore()]);
   updateRanking();
   init();
 
@@ -454,11 +457,11 @@ var span = document.getElementsByClassName("close")[0];
 * Eventlistener for the modal
 */
 
-$("#closeButton").click(function() {
+$(".closeButton").click(function() {
   saveName();
 });
 
-$("#closeButton").keypress(function() {
+$(".closeButton").keypress(function() {
       saveName();
 
 });

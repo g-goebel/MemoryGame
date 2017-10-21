@@ -16,7 +16,6 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-
 }
 
 body {
@@ -43,12 +42,11 @@ h1 {
 */
 
 .deck {
-
   max-width: 660px;
   width: 50vw;
   max-height: 660px;
   height: 50vw;
-
+  overflow: auto;
   background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%);
   padding: 2%;
   border-radius: 10px;
@@ -57,16 +55,14 @@ h1 {
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
-  margin: 0 0 3em;
 }
-
 
 .deck .card {
   max-width: 125px;
   max-height: 125px;
   width: 10vw;
   height: 10vw;
-  box-sizing: border-box;
+  /*box-sizing: border-box;*/
   background: #2e3d49;
   font-size: 0;
   color: #ffffff;
@@ -75,7 +71,7 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 1%;
+  /*margin: 1%;*/
   box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
 }
 
@@ -86,13 +82,13 @@ h1 {
 }
 
 .deck .card.show {
-  font-size: 3vw;
+  font-size: 2.5vw;
 }
 
 .deck .card.match {
   cursor: default;
   background: #02ccba;
-  font-size: 3vw;
+  font-size: 2.5vw;
 }
 
 /*
@@ -161,8 +157,16 @@ h1 {
 /*
 * Styles for the table
 */
-table {
+.tableContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  max-width: 100%;
+  max-height: 100%;
+}
 
+table {
   width: 40%;
   padding: 1em;
 }
@@ -193,12 +197,10 @@ th {
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgb(0,0,0);
-  background-color: rgba(0,0,0,0.6);
+  background-color: rgba(0, 0, 0, 0.6);
   -webkit-box-shadow: 9px 10px 59px 5px rgba(0,0,0,0.75);
   -moz-box-shadow: 9px 10px 59px 5px rgba(0,0,0,0.75);
   box-shadow: 9px 10px 59px 5px rgba(0,0,0,0.75);
-
 }
 
 /* Modal Content/Box */
@@ -206,42 +208,48 @@ th {
   background-color: #fefefe;
   margin: 15% auto;
   padding: 20px;
-  border: 1px solid #888;
-  width: 35%;
+  box-sizing: border-box;
+  height: auto;
+  width: auto;
   font-size: 20px;
   text-align: center;
   white-space: pre-line;
+  position: fixed;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: auto;
+  border: 1px solid #888888;
   border-radius: 20px 20px 20px 20px;
   -moz-border-radius: 20px 20px 20px 20px;
   -webkit-border-radius: 20px 20px 20px 20px;
-  border: 5px double #FFD700;
+  border: 5px double #ffd700;
 }
 
 .modal-heading {
-  font-family: 'Permanent Marker', cursive;
-  font-size: 3vw;
+  font: 3vw 'Permanent Marker', cursive;
   margin: auto;
   overflow: hidden;
 }
 
 .modal-trophy {
   font-size: 20vw;
-  color: #FFD700;
+  color: #ffd700;
   margin-top: -0.2em;
 }
 
-#finalScore {
+.finalScore {
   -webkit-margin-after: -1em;
   font-size: 2vw;
 }
 
-#playerName {
+.playerName {
   width: 50%;
   height: 3em;
   padding-top: 0;
 }
 
-#closeButton {
+.closeButton {
   width: 30%;
   height: 3em;
 }
