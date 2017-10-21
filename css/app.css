@@ -1,5 +1,7 @@
 html {
   box-sizing: border-box;
+  height: 100%;
+  width: 100%;
 }
 
 *,
@@ -14,6 +16,7 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
+
 }
 
 body {
@@ -26,6 +29,8 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 h1 {
@@ -38,10 +43,14 @@ h1 {
 */
 
 .deck {
-  width: 660px;
-  min-height: 680px;
+
+  max-width: 660px;
+  width: 50vw;
+  max-height: 660px;
+  height: 50vw;
+
   background: linear-gradient(160deg, #02ccba 0%, #aa7ecd 100%);
-  padding: 32px;
+  padding: 2%;
   border-radius: 10px;
   box-shadow: 12px 15px 20px 0 rgba(46, 61, 73, 0.5);
   display: flex;
@@ -51,9 +60,13 @@ h1 {
   margin: 0 0 3em;
 }
 
+
 .deck .card {
-  height: 125px;
-  width: 125px;
+  max-width: 125px;
+  max-height: 125px;
+  width: 10vw;
+  height: 10vw;
+  box-sizing: border-box;
   background: #2e3d49;
   font-size: 0;
   color: #ffffff;
@@ -62,6 +75,7 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin: 1%;
   box-shadow: 5px 2px 20px 0 rgba(46, 61, 73, 0.5);
 }
 
@@ -72,13 +86,13 @@ h1 {
 }
 
 .deck .card.show {
-  font-size: 33px;
+  font-size: 3vw;
 }
 
 .deck .card.match {
   cursor: default;
   background: #02ccba;
-  font-size: 33px;
+  font-size: 3vw;
 }
 
 /*
@@ -205,17 +219,20 @@ th {
 
 .modal-heading {
   font-family: 'Permanent Marker', cursive;
-
+  font-size: 3vw;
+  margin: auto;
+  overflow: hidden;
 }
 
 .modal-trophy {
-  font-size: 10em;
+  font-size: 20vw;
   color: #FFD700;
   margin-top: -0.2em;
 }
 
 #finalScore {
   -webkit-margin-after: -1em;
+  font-size: 2vw;
 }
 
 #playerName {
